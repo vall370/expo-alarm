@@ -10,6 +10,7 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.Exceptions
+import com.expo.modules.alarm.receivers.AlarmReceiver
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.*

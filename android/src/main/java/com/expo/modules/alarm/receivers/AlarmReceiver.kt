@@ -1,4 +1,4 @@
-package expo.modules.alarm
+package com.expo.modules.alarm.receivers
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -38,7 +38,8 @@ class AlarmReceiver : BroadcastReceiver() {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
 
         // Create dismiss action
-        val dismissIntent = Intent(context, AlarmDismissReceiver::class.java).apply {
+        val dismissIntent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = "DISMISS_ACTION"
             putExtra("identifier", identifier)
         }
         val dismissPendingIntent = PendingIntent.getBroadcast(
@@ -52,6 +53,24 @@ class AlarmReceiver : BroadcastReceiver() {
             android.R.drawable.ic_menu_close_clear_cancel,
             "Dismiss",
             dismissPendingIntent
+        )
+
+        // Create snooze action
+        val snoozeIntent = Intent(context, NotificationActionReceiver::class.java).apply {
+            action = "SNOOZE_ACTION"
+            putExtra("identifier", identifier)
+        }
+        val snoozePendingIntent = PendingIntent.getBroadcast(
+            context,
+            identifier.hashCode() + 1,
+            snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        notificationBuilder.addAction(
+            android.R.drawable.ic_media_play,
+            "Snooze",
+            snoozePendingIntent
         )
 
         val notificationManager = NotificationManagerCompat.from(context)

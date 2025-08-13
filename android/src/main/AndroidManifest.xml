@@ -1,19 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="expo.modules.alarm">
-  <uses-permission android:name="android.permission.WAKE_LOCK" />
-  <uses-permission android:name="android.permission.VIBRATE" />
-  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-  <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.expo.modules.alarm">
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        android:minSdkVersion="34" 
+    />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-  <application>
-    <receiver 
-      android:name=".AlarmReceiver"
-      android:enabled="true"
-      android:exported="false" />
-    
-    <receiver 
-      android:name=".AlarmDismissReceiver"
-      android:enabled="true"
-      android:exported="false" />
-  </application>
+    <application>
+        <receiver
+            android:name="com.expo.modules.alarm.receivers.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true"
+            />
+        <receiver
+            android:name="com.expo.modules.alarm.receivers.BootReceiver"
+            android:exported="true"
+        >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.expo.modules.alarm.receivers.NotificationActionReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="DISMISS_ACTION" />
+                <action android:name="SNOOZE_ACTION" />
+            </intent-filter>
+        </receiver>
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+        <service 
+            android:name="com.expo.modules.alarm.AlarmService"
+            android:foregroundServiceType="mediaPlayback"
+        />
+
+    </application>
 </manifest>

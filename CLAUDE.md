@@ -16,6 +16,7 @@ This is an Expo module called `expo-alarm` that provides cross-platform alarm sc
 - `npm run prepublishOnly` - Prepare for publishing
 - `npm run open:ios` - Open iOS example project in Xcode
 - `npm run open:android` - Open Android example project in Android Studio
+- `npm run expo-module` - Access expo-module-scripts CLI directly
 
 ## Architecture
 
@@ -30,6 +31,9 @@ This is an Expo module called `expo-alarm` that provides cross-platform alarm sc
   - `ExpoAlarmModule.kt` - Android native module with AlarmManager integration and SharedPreferences storage
   - `AlarmReceiver.kt` - BroadcastReceiver for handling alarm triggers and notifications
   - `AlarmDismissReceiver.kt` - BroadcastReceiver for handling alarm dismissals
+  - `AlarmService.kt` - Foreground service for alarm handling
+  - `BootReceiver.kt` - Handles device boot to reschedule alarms
+  - `NotificationActionReceiver.kt` - Handles dismiss/snooze notification actions
 
 - **iOS Layer** (`ios/`):
   - `ExpoAlarmModule.swift` - iOS native module with UserNotifications framework and UserDefaults storage
@@ -57,6 +61,9 @@ The `example/` directory contains a complete React Native app demonstrating:
   - AlarmReceiver creates high-priority notifications with dismiss actions
   - Requires SCHEDULE_EXACT_ALARM permission on Android 12+
   - Alarm data persisted in SharedPreferences with JSON serialization
+  - Foreground service (`AlarmService`) for reliable alarm handling
+  - Boot receiver reschedules alarms after device restart
+  - Full notification action support (dismiss/snooze)
 - **iOS Implementation**: 
   - Uses UserNotifications framework with UNCalendarNotificationTrigger for one-time and UNTimeIntervalNotificationTrigger for repeating
   - Ready for AlarmKit integration on iOS 16+ (currently falls back to notifications)
@@ -92,3 +99,20 @@ All platform implementations expose the same JavaScript interface:
 - Example app at `example/App.tsx` demonstrates full API usage with React hooks
 - Use `npm run open:ios` and `npm run open:android` to test native implementations
 - Web testing can be done through standard React Native Web setup
+
+## Required Permissions (Android)
+Module automatically declares the following in AndroidManifest.xml:
+- `android.permission.SCHEDULE_EXACT_ALARM` - Required for exact alarm scheduling on Android 12+
+- `android.permission.USE_EXACT_ALARM` - Alternative exact alarm permission
+- `android.permission.VIBRATE` - For alarm vibration
+- `android.permission.RECEIVE_BOOT_COMPLETED` - To reschedule alarms after device boot
+- `android.permission.FOREGROUND_SERVICE` - For foreground alarm service
+- `android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK` - For media playback service type (Android 14+)
+- `android.permission.POST_NOTIFICATIONS` - For showing alarm notifications
+- `android.permission.WAKE_LOCK` - To wake device when alarm triggers
+
+## Package Information
+- **Package Name**: `@vall370/expo-alarm`
+- **Version**: 0.1.0
+- **Repository**: https://github.com/vall370/expo-alarm
+- **NPM Registry**: https://registry.npmjs.org/
