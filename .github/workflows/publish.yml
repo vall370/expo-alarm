@@ -28,8 +28,7 @@ jobs:
         run: npm run build
 
       - name: Run tests
-        run: npm test -- --passWithNoTests --silent
-        continue-on-error: true
+        run: npm test
 
       - name: Run linting
         run: npm run lint
