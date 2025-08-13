@@ -1,6 +1,10 @@
-import { registerWebModule, NativeModule } from 'expo';
+import { registerWebModule, NativeModule } from "expo";
 
-import { ExpoAlarmModuleEvents, AlarmTriggerInput, AlarmInfo } from './ExpoAlarm.types';
+import {
+  ExpoAlarmModuleEvents,
+  AlarmTriggerInput,
+  AlarmInfo,
+} from "./ExpoAlarm.types";
 
 class ExpoAlarmModule extends NativeModule<ExpoAlarmModuleEvents> {
   private alarms: Map<string, AlarmInfo> = new Map();
@@ -11,24 +15,30 @@ class ExpoAlarmModule extends NativeModule<ExpoAlarmModuleEvents> {
     return false;
   }
 
-  async requestPermissionsAsync(): Promise<{ granted: boolean; canAskAgain: boolean }> {
+  async requestPermissionsAsync(): Promise<{
+    granted: boolean;
+    canAskAgain: boolean;
+  }> {
     // Web doesn't require permissions for notifications
     return { granted: true, canAskAgain: false };
   }
 
-  async getPermissionsAsync(): Promise<{ granted: boolean; canAskAgain: boolean }> {
+  async getPermissionsAsync(): Promise<{
+    granted: boolean;
+    canAskAgain: boolean;
+  }> {
     return { granted: true, canAskAgain: false };
   }
 
   async scheduleAlarmAsync(alarm: AlarmTriggerInput): Promise<void> {
-    if (!('Notification' in window)) {
-      throw new Error('Notifications are not supported in this browser');
+    if (!("Notification" in window)) {
+      throw new Error("Notifications are not supported in this browser");
     }
 
-    if (Notification.permission !== 'granted') {
+    if (Notification.permission !== "granted") {
       const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        throw new Error('Notification permission not granted');
+      if (permission !== "granted") {
+        throw new Error("Notification permission not granted");
       }
     }
 
@@ -56,22 +66,23 @@ class ExpoAlarmModule extends NativeModule<ExpoAlarmModuleEvents> {
       const timeout = setTimeout(() => {
         this.triggerAlarm(alarmInfo);
       }, delay);
-      
+
       this.timeouts.set(alarm.identifier, timeout);
     } else {
-      throw new Error('Alarm time must be in the future');
+      throw new Error("Alarm time must be in the future");
     }
   }
 
   private triggerAlarm(alarm: AlarmInfo): void {
-    if ('Notification' in window && Notification.permission === 'granted') {
+    if ("Notification" in window && Notification.permission === "granted") {
+      // eslint-disable-next-line no-new
       new Notification(alarm.title, {
         body: alarm.body,
-        icon: '/favicon.ico',
+        icon: "/favicon.ico",
       });
     }
 
-    this.emit('alarmTriggered', {
+    this.emit("alarmTriggered", {
       identifier: alarm.identifier,
       title: alarm.title,
       body: alarm.body,
@@ -83,11 +94,11 @@ class ExpoAlarmModule extends NativeModule<ExpoAlarmModuleEvents> {
       const nextDate = new Date(alarm.date.getTime() + alarm.repeatInterval);
       const updatedAlarm = { ...alarm, date: nextDate };
       this.alarms.set(alarm.identifier, updatedAlarm);
-      
+
       const timeout = setTimeout(() => {
         this.triggerAlarm(updatedAlarm);
       }, alarm.repeatInterval);
-      
+
       this.timeouts.set(alarm.identifier, timeout);
     } else {
       this.alarms.delete(alarm.identifier);
@@ -125,4 +136,4 @@ class ExpoAlarmModule extends NativeModule<ExpoAlarmModuleEvents> {
   }
 }
 
-export default registerWebModule(ExpoAlarmModule, 'ExpoAlarmModule');
+export default registerWebModule(ExpoAlarmModule, "ExpoAlarmModule");
