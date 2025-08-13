@@ -16,12 +16,8 @@ Expo Alarm module for Android and iOS with cross-platform alarm scheduling suppo
 
 ```bash
 npm install expo-alarm
-```
-
-## Usage
-
-```typescript
-import ExpoAlarm, { AlarmTriggerInput } from 'expo-alarm';
+Usage
+typescriptimport ExpoAlarm, { AlarmTriggerInput } from 'expo-alarm';
 
 // Check if alarms are supported
 const isSupported = ExpoAlarm.isSupported();
@@ -40,47 +36,43 @@ await ExpoAlarm.scheduleAlarmAsync({
 
 // Listen for alarm events
 import { useEvent } from 'expo';
-
 const onAlarmTriggered = useEvent(ExpoAlarm, 'alarmTriggered');
 const onAlarmDismissed = useEvent(ExpoAlarm, 'alarmDismissed');
-```
+API
+Methods
 
-## API
+isSupported(): boolean - Check if alarm scheduling is supported
+requestPermissionsAsync(): Promise<{granted: boolean, canAskAgain: boolean}> - Request alarm permissions
+getPermissionsAsync(): Promise<{granted: boolean, canAskAgain: boolean}> - Get current permission status
+scheduleAlarmAsync(alarm: AlarmTriggerInput): Promise<void> - Schedule a new alarm
+cancelAlarmAsync(identifier: string): Promise<void> - Cancel a specific alarm
+cancelAllAlarmsAsync(): Promise<void> - Cancel all scheduled alarms
+getAllAlarmsAsync(): Promise<AlarmInfo[]> - Get all scheduled alarms
+getAlarmAsync(identifier: string): Promise<AlarmInfo | null> - Get a specific alarm
+hasAlarmAsync(identifier: string): Promise<boolean> - Check if an alarm exists
 
-### Methods
+Events
 
-- `isSupported(): boolean` - Check if alarm scheduling is supported
-- `requestPermissionsAsync(): Promise<{granted: boolean, canAskAgain: boolean}>` - Request alarm permissions
-- `getPermissionsAsync(): Promise<{granted: boolean, canAskAgain: boolean}>` - Get current permission status
-- `scheduleAlarmAsync(alarm: AlarmTriggerInput): Promise<void>` - Schedule a new alarm
-- `cancelAlarmAsync(identifier: string): Promise<void>` - Cancel a specific alarm
-- `cancelAllAlarmsAsync(): Promise<void>` - Cancel all scheduled alarms
-- `getAllAlarmsAsync(): Promise<AlarmInfo[]>` - Get all scheduled alarms
-- `getAlarmAsync(identifier: string): Promise<AlarmInfo | null>` - Get a specific alarm
-- `hasAlarmAsync(identifier: string): Promise<boolean>` - Check if an alarm exists
+alarmTriggered - Fired when an alarm is triggered
+alarmDismissed - Fired when an alarm is dismissed
 
-### Events
+Platform Support
 
-- `alarmTriggered` - Fired when an alarm is triggered
-- `alarmDismissed` - Fired when an alarm is dismissed
+Android: Uses AlarmManager for reliable alarm scheduling. Requires SCHEDULE_EXACT_ALARM permission on Android 12+.
+iOS: Uses UserNotifications framework. iOS 16+ structure ready for AlarmKit integration.
+Web: Uses browser notifications as fallback with limited capabilities.
 
-## Platform Support
+Permissions
+Android
 
-- **Android**: Uses AlarmManager for reliable alarm scheduling. Requires `SCHEDULE_EXACT_ALARM` permission on Android 12+.
-- **iOS**: Uses UserNotifications framework. iOS 16+ structure ready for AlarmKit integration.
-- **Web**: Uses browser notifications as fallback with limited capabilities.
+android.permission.SCHEDULE_EXACT_ALARM (Android 12+)
+android.permission.USE_EXACT_ALARM
+android.permission.WAKE_LOCK
+android.permission.VIBRATE
 
-## Permissions
+iOS
 
-### Android
-- `android.permission.SCHEDULE_EXACT_ALARM` (Android 12+)
-- `android.permission.USE_EXACT_ALARM`
-- `android.permission.WAKE_LOCK`
-- `android.permission.VIBRATE`
+User Notifications permission is automatically requested when needed.
 
-### iOS
-- User Notifications permission is automatically requested when needed.
-
-## Example
-
-See the `example/` directory for a complete working example demonstrating all features.
+Example
+See the example/ directory for a complete working example demonstrating all features.

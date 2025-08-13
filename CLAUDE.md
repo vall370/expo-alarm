@@ -22,18 +22,18 @@ This is an Expo module called `expo-alarm` that provides cross-platform alarm sc
 ### Module Structure
 - **JavaScript Layer** (`src/`):
   - `ExpoAlarmModule.ts` - Native module interface and type definitions
-  - `ExpoAlarmView.tsx` - React Native view component
-  - `ExpoAlarm.types.ts` - TypeScript type definitions
+  - `ExpoAlarm.types.ts` - TypeScript type definitions for AlarmTriggerInput, AlarmInfo, and events
+  - `ExpoAlarmModule.web.ts` - Web implementation using browser notifications and setTimeout
   - `index.ts` - Main export file
-  - `.web.ts` files - Web platform implementations
 
 - **Android Layer** (`android/src/main/java/expo/modules/alarm/`):
-  - `ExpoAlarmModule.kt` - Android native module implementation
-  - `ExpoAlarmView.kt` - Android native view implementation
+  - `ExpoAlarmModule.kt` - Android native module with AlarmManager integration and SharedPreferences storage
+  - `AlarmReceiver.kt` - BroadcastReceiver for handling alarm triggers and notifications
+  - `AlarmDismissReceiver.kt` - BroadcastReceiver for handling alarm dismissals
 
 - **iOS Layer** (`ios/`):
-  - `ExpoAlarmModule.swift` - iOS native module implementation
-  - `ExpoAlarmView.swift` - iOS native view implementation
+  - `ExpoAlarmModule.swift` - iOS native module with UserNotifications framework and UserDefaults storage
+  - Conditional AlarmKit integration for iOS 16+ (structure ready, falls back to UserNotifications)
 
 ### Module Configuration
 - `expo-module.config.json` defines platform-specific module mappings
@@ -52,12 +52,21 @@ The `example/` directory contains a complete React Native app demonstrating:
 
 - Uses `expo-module-scripts` for build tooling
 - TypeScript configuration in `tsconfig.json`
-- **Android Implementation**: Uses AlarmManager with AlarmReceiver for background alarms
-- **iOS Implementation**: Uses UserNotifications framework with AlarmKit structure ready for iOS 16+
-- **Web Implementation**: Uses browser notifications as fallback with limited capabilities
+- **Android Implementation**: 
+  - Uses AlarmManager with `setExactAndAllowWhileIdle` for one-time alarms and `setRepeating` for repeating alarms
+  - AlarmReceiver creates high-priority notifications with dismiss actions
+  - Requires SCHEDULE_EXACT_ALARM permission on Android 12+
+  - Alarm data persisted in SharedPreferences with JSON serialization
+- **iOS Implementation**: 
+  - Uses UserNotifications framework with UNCalendarNotificationTrigger for one-time and UNTimeIntervalNotificationTrigger for repeating
+  - Ready for AlarmKit integration on iOS 16+ (currently falls back to notifications)
+  - Alarm data persisted in UserDefaults with JSON serialization
+- **Web Implementation**: 
+  - Limited functionality using browser notifications and setTimeout
+  - Reports isSupported() as false due to limitations
+  - In-memory alarm storage (does not persist across page reloads)
 - Platform-specific code automatically resolved by Expo module system
-- Proper permission handling for each platform
-- Event-driven architecture for alarm lifecycle management
+- Event-driven architecture for alarm lifecycle management with `alarmTriggered` and `alarmDismissed` events
 
 ## Key Features
 - Cross-platform alarm scheduling (Android, iOS, Web)
@@ -65,3 +74,21 @@ The `example/` directory contains a complete React Native app demonstrating:
 - Repeating and one-time alarms
 - Alarm persistence and management
 - Event notifications for alarm triggers
+
+## Native Module API
+All platform implementations expose the same JavaScript interface:
+- `isSupported()` - Platform capability check
+- `requestPermissionsAsync()` / `getPermissionsAsync()` - Permission handling
+- `scheduleAlarmAsync(AlarmTriggerInput)` - Schedule alarms with identifier, title, body, date, repeating options
+- `cancelAlarmAsync(identifier)` / `cancelAllAlarmsAsync()` - Alarm cancellation
+- `getAllAlarmsAsync()` / `getAlarmAsync(identifier)` / `hasAlarmAsync(identifier)` - Alarm retrieval and checking
+
+## Data Persistence
+- **Android**: SharedPreferences with `alarm_${identifier}` keys, JSON serialized AlarmInfo objects
+- **iOS**: UserDefaults with single `ExpoAlarmModule_alarms` key containing all alarms dictionary
+- **Web**: In-memory Map storage (not persistent)
+
+## Testing and Development
+- Example app at `example/App.tsx` demonstrates full API usage with React hooks
+- Use `npm run open:ios` and `npm run open:android` to test native implementations
+- Web testing can be done through standard React Native Web setup
