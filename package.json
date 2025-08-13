@@ -1,6 +1,6 @@
 {
   "name": "@vall370/expo-alarm",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Cross-platform alarm scheduling module for Expo and React Native with Android AlarmManager, iOS UserNotifications, and Web support",
   "main": "build/index.js",
   "types": "build/index.d.ts",
